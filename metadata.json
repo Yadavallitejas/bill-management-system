@@ -1,0 +1,5 @@
+{
+  "name": "DebtLedger Pro",
+  "description": "A robust transaction-based debt management system for tracking users, bills, and payments with real-time deficiency calculations.",
+  "requestFramePermissions": []
+}
