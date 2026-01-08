@@ -5,6 +5,7 @@ import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { UserDirectory } from './components/UserDirectory';
 import { UserDetail } from './components/UserDetail';
+import { Expenses } from './components/Expenses';
 
 const App: React.FC = () => {
   const [view, setView] = useState('dashboard');
@@ -26,6 +27,8 @@ const App: React.FC = () => {
         return <Dashboard onViewUser={handleNavigateToUser} />;
       case 'users':
         return <UserDirectory onSelectUser={handleNavigateToUser} />;
+      case 'expenses':
+        return <Expenses />;
       case 'user_detail':
         return selectedUserId ? (
           <UserDetail userId={selectedUserId} onBack={() => setView('users')} />

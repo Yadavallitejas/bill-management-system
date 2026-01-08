@@ -4,18 +4,23 @@ import { useLedger } from '../store/LedgerContext';
 import { formatCurrency } from '../services/finance';
 
 export const Dashboard: React.FC<{ onViewUser: (id: string) => void }> = ({ onViewUser }) => {
-  const { users, bills, transactions } = useLedger();
+  const { users, bills, transactions, expenses } = useLedger();
 
   const totalOutstanding = bills.reduce((sum, b) => sum + b.totalAmount, 0) - transactions.reduce((sum, t) => sum + t.paidAmount, 0);
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const activeBills = bills.length;
   const uniqueUsers = users.length;
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Outstanding</h3>
           <p className="text-3xl font-bold text-indigo-600 mt-1">{formatCurrency(totalOutstanding)}</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Expenses</h3>
+          <p className="text-3xl font-bold text-red-600 mt-1">{formatCurrency(totalExpenses)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider">Active Users</h3>

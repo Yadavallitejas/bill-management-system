@@ -24,6 +24,15 @@ export interface Transaction {
   createdAt: number;
 }
 
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  category: 'COGS' | 'Rent' | 'Utilities' | 'Salary' | 'Marketing' | 'Other';
+  date: string;
+  createdAt: number;
+}
+
 export interface BillSummary extends Bill {
   totalPaid: number;
   deficiency: number;

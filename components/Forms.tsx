@@ -1,26 +1,39 @@
 
 import React, { useState } from 'react';
 import { useLedger } from '../store/LedgerContext';
+import { User, Expense } from '../types';
 
-export const UserForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
-  const { addUser } = useLedger();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+export const UserForm: React.FC<{ onSuccess: () => void; initialData?: User }> = ({ onSuccess, initialData }) => {
+  const { addUser, editUser } = useLedger();
+  const [name, setName] = useState(initialData?.name || '');
+  const [email, setEmail] = useState(initialData?.email || '');
+  const [phone, setPhone] = useState(initialData?.phone || '');
+
+  const isEditing = !!initialData;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email) return;
-    addUser(name, email, phone);
-    setName('');
-    setEmail('');
-    setPhone('');
+    
+    if (isEditing && initialData) {
+      editUser(initialData.id, name, email, phone);
+    } else {
+      addUser(name, email, phone);
+    }
+    
+    if (!isEditing) {
+      setName('');
+      setEmail('');
+      setPhone('');
+    }
     onSuccess();
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-      <h3 className="text-lg font-bold text-slate-800 mb-2">Register New User</h3>
+      <h3 className="text-lg font-bold text-slate-800 mb-2">
+        {isEditing ? 'Edit Profile' : 'Register New User'}
+      </h3>
       <div>
         <label className="block text-sm font-medium text-slate-700">Full Name</label>
         <input 
@@ -46,7 +59,7 @@ export const UserForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => 
         />
       </div>
       <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors font-medium">
-        Save User
+        {isEditing ? 'Update Profile' : 'Save User'}
       </button>
     </form>
   );
@@ -148,6 +161,73 @@ export const PaymentForm: React.FC<{ billId: string, onSuccess: () => void }> = 
       </div>
       <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors font-medium">
         Post Transaction
+      </button>
+    </form>
+  );
+};
+
+export const ExpenseForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+  const { addExpense } = useLedger();
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState<Expense['category']>('Other');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const numAmount = parseFloat(amount);
+    if (!description || isNaN(numAmount) || !date) return;
+    addExpense(description, numAmount, category, date);
+    setDescription('');
+    setAmount('');
+    onSuccess();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+      <h3 className="text-lg font-bold text-slate-800 mb-2">Record General Expense</h3>
+      <div>
+        <label className="block text-sm font-medium text-slate-700">Description</label>
+        <input 
+          type="text" required placeholder="e.g. Office Supplies"
+          value={description} onChange={e => setDescription(e.target.value)}
+          className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Amount</label>
+          <input 
+            type="number" step="0.01" required
+            value={amount} onChange={e => setAmount(e.target.value)}
+            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Category</label>
+          <select 
+            value={category} onChange={e => setCategory(e.target.value as any)}
+            className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+          >
+            <option value="COGS">COGS</option>
+            <option value="Rent">Rent</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Salary">Salary</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700">Date</label>
+        <input 
+          type="date" required
+          value={date} onChange={e => setDate(e.target.value)}
+          className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+        />
+      </div>
+      <button type="submit" className="w-full bg-slate-800 text-white py-2 px-4 rounded-md hover:bg-slate-900 transition-colors font-medium">
+        Add Expense
       </button>
     </form>
   );
